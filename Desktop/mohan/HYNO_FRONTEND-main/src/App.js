@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ToastProvider } from './contexts/ToastContext';
 import { CartProvider } from './contexts/CartContext';
 import { AuthProvider } from './contexts/AuthContext';
+import { ProductProvider } from './contexts/ProductContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import SideNav from './components/SideNav';
@@ -31,7 +32,8 @@ function App() {
   return (
     <AuthProvider>
       <CartProvider>
-        <ToastProvider>
+        <ProductProvider>
+          <ToastProvider>
           <Router>
             <Routes>
               {/* ✅ Landing page has no Header/SideNav/Footer */}
@@ -76,7 +78,8 @@ function App() {
               />
             </Routes>
           </Router>
-        </ToastProvider>
+          </ToastProvider>
+        </ProductProvider>
       </CartProvider>
     </AuthProvider>
   );

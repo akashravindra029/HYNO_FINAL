@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FaUsers, FaShoppingCart, FaChartLine, FaExclamationTriangle, FaEye, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaUsers, FaShoppingCart, FaChartLine, FaExclamationTriangle, FaEye, FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
+import { useProducts } from '../contexts/ProductContext';
+import { useToast } from '../contexts/ToastContext';
 import './Admin.css';
 
 const Admin = () => {
@@ -9,6 +11,16 @@ const Admin = () => {
   const [users, setUsers] = useState([]);
   const [orders, setOrders] = useState([]);
   const [medicines, setMedicines] = useState([]);
+  const [showAddProductForm, setShowAddProductForm] = useState(false);
+  const [newProduct, setNewProduct] = useState({
+    name: '',
+    price: '',
+    category: '',
+    image: ''
+  });
+
+  const { products, addProduct } = useProducts();
+  const { showSuccess, showError } = useToast();
 
   useEffect(() => {
     // Mock data - in real app, this would come from APIs
@@ -31,12 +43,34 @@ const Admin = () => {
       { id: 'ORD-003', customer: 'Bob Johnson', total: 67.98, status: 'processing', date: '2024-01-13' }
     ]);
 
-    setMedicines([
-      { id: 1, name: 'Paracetamol 500mg', stock: 150, price: 5.99, status: 'in-stock' },
-      { id: 2, name: 'Ibuprofen 200mg', stock: 0, price: 7.49, status: 'out-of-stock' },
-      { id: 3, name: 'Amoxicillin 500mg', stock: 75, price: 12.99, status: 'low-stock' }
-    ]);
-  }, []);
+    // Use products from context instead of mock data
+    setMedicines(products.map(product => ({
+      id: product.id,
+      name: product.name,
+      stock: product.inStock ? 100 : 0, // Mock stock based on inStock
+      price: product.price,
+      status: product.inStock ? 'in-stock' : 'out-of-stock'
+    })));
+  }, [products]);
+
+  const handleAddProduct = (e) => {
+    e.preventDefault();
+    if (!newProduct.name || !newProduct.price || !newProduct.category) {
+      showError('Please fill in all required fields');
+      return;
+    }
+
+    addProduct({
+      name: newProduct.name,
+      price: parseFloat(newProduct.price),
+      category: newProduct.category,
+      image: newProduct.image || '/products/default.jpg'
+    });
+
+    showSuccess('Product added successfully!');
+    setNewProduct({ name: '', price: '', category: '', image: '' });
+    setShowAddProductForm(false);
+  };
 
   const renderDashboard = () => (
     <motion.div
@@ -273,8 +307,84 @@ const Admin = () => {
     >
       <div className="management-header">
         <h2>Medicine Inventory</h2>
-        <button className="btn btn-primary">Add New Medicine</button>
+        <button
+          className="btn btn-primary"
+          onClick={() => setShowAddProductForm(!showAddProductForm)}
+        >
+          <FaPlus /> Add New Product
+        </button>
       </div>
+
+      {showAddProductForm && (
+        <motion.div
+          className="add-product-form"
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+        >
+          <form onSubmit={handleAddProduct}>
+            <div className="form-group">
+              <label>Product Name *</label>
+              <input
+                type="text"
+                value={newProduct.name}
+                onChange={(e) => setNewProduct({...newProduct, name: e.target.value})}
+                placeholder="Enter product name"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Price *</label>
+              <input
+                type="number"
+                step="0.01"
+                value={newProduct.price}
+                onChange={(e) => setNewProduct({...newProduct, price: e.target.value})}
+                placeholder="Enter price"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Category *</label>
+              <select
+                value={newProduct.category}
+                onChange={(e) => setNewProduct({...newProduct, category: e.target.value})}
+                required
+              >
+                <option value="">Select category</option>
+                <option value="Pain Relief">Pain Relief</option>
+                <option value="Antibiotics">Antibiotics</option>
+                <option value="Vitamins">Vitamins</option>
+                <option value="Skin Care">Skin Care</option>
+                <option value="Digestive Health">Digestive Health</option>
+                <option value="Allergy">Allergy</option>
+                <option value="Diabetes">Diabetes</option>
+                <option value="Blood Pressure">Blood Pressure</option>
+                <option value="Cholesterol">Cholesterol</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Image URL</label>
+              <input
+                type="text"
+                value={newProduct.image}
+                onChange={(e) => setNewProduct({...newProduct, image: e.target.value})}
+                placeholder="Enter image URL (optional)"
+              />
+            </div>
+            <div className="form-actions">
+              <button type="submit" className="btn btn-primary">Add Product</button>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setShowAddProductForm(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </motion.div>
+      )}
 
       <div className="data-table">
         <table>
