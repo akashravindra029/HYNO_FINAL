@@ -1,0 +1,3 @@
+- [x] Update react-scripts version in package.json to 5.0.1
+- [x] Run npm install
+- [ ] Test npm start

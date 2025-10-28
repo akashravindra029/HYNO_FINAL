@@ -1,0 +1,262 @@
+/* Medicine.css */
+.medicine-card {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  position: relative;
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.medicine-card:hover {
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.medicine-image {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.medicine-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.medicine-card:hover .medicine-image img {
+  transform: scale(1.05);
+}
+
+.prescription-badge,
+.discount-badge {
+  position: absolute;
+  top: 10px;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.prescription-badge {
+  left: 10px;
+  background: #e74c3c;
+  color: white;
+}
+
+.discount-badge {
+  right: 10px;
+  background: #27ae60;
+  color: white;
+}
+
+.medicine-info {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.medicine-name {
+  margin: 0 0 5px 0;
+  font-size: 1.2rem;
+  color: #333;
+  font-weight: 700;
+}
+
+.medicine-brand {
+  margin: 0 0 10px 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.medicine-rating {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.stars {
+  display: flex;
+  gap: 2px;
+}
+
+.star {
+  color: #ddd;
+  font-size: 0.9rem;
+}
+
+.star.filled {
+  color: #f39c12;
+}
+
+.rating-text {
+  color: #666;
+  font-size: 0.8rem;
+}
+
+.medicine-price {
+  margin-bottom: 15px;
+}
+
+.current-price {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #667eea;
+}
+
+.original-price {
+  text-decoration: line-through;
+  color: #999;
+  font-size: 1rem;
+  margin-left: 10px;
+}
+
+.medicine-description {
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 15px;
+  flex: 1;
+}
+
+.read-more-btn {
+  background: none;
+  border: none;
+  color: #667eea;
+  cursor: pointer;
+  font-weight: 600;
+  padding: 0;
+  margin-left: 5px;
+  text-decoration: underline;
+}
+
+.medicine-details {
+  margin-bottom: 15px;
+}
+
+.detail-item {
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.detail-item strong {
+  color: #333;
+}
+
+.medicine-stock {
+  margin-bottom: 15px;
+}
+
+.in-stock {
+  color: #27ae60;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.out-of-stock {
+  color: #e74c3c;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.medicine-actions {
+  padding: 0 20px 20px 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.wishlist-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.add-to-cart-btn {
+  flex: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.add-to-cart-btn.disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.medicine-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(102, 126, 234, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.quick-view-btn {
+  background: white;
+  color: #667eea;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.quick-view-btn:hover {
+  background: #f8f9fa;
+  transform: scale(1.05);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .medicine-card {
+    margin-bottom: 20px;
+  }
+
+  .medicine-actions {
+    flex-direction: column;
+  }
+
+  .wishlist-btn,
+  .add-to-cart-btn {
+    flex: none;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .medicine-info {
+    padding: 15px;
+  }
+
+  .medicine-actions {
+    padding: 0 15px 15px 15px;
+  }
+
+  .medicine-name {
+    font-size: 1.1rem;
+  }
+
+  .current-price {
+    font-size: 1.2rem;
+  }
+}
