@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaCreditCard, FaMoneyBillWave, FaMobileAlt } from 'react-icons/fa';
+import { FaCreditCard, FaMoneyBillWave, FaMobileAlt, FaTag, FaFilePrescription } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
-import { getOrders, saveOrders } from '../utils/localStorage';
-import { orders as mockOrders } from '../data/mockData';
+import { useOrder } from '../contexts/OrderContext';
+import { useOffer } from '../contexts/OfferContext';
+import { getProducts, saveProducts } from '../utils/localStorage';
+import { products } from '../data/mockData';
+import PrescriptionUpload from '../components/PrescriptionUpload';
 
 const Checkout = () => {
   const { items, getTotalPrice, clearCart } = useCart();
+  const { addOrder } = useOrder();
+  const { appliedOffer, applyOffer, calculateDiscount, clearAppliedOffer, incrementOfferUsage } = useOffer();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [shippingInfo, setShippingInfo] = useState({
@@ -24,10 +29,15 @@ const Checkout = () => {
     expiry: '',
     cvv: '',
   });
+  const [couponCode, setCouponCode] = useState('');
+  const [couponError, setCouponError] = useState('');
+  const [showPrescriptionUpload, setShowPrescriptionUpload] = useState(false);
+  const [uploadedPrescriptions, setUploadedPrescriptions] = useState([]);
 
   const subtotal = getTotalPrice();
+  const discount = calculateDiscount(appliedOffer, subtotal);
   const shipping = subtotal > 50 ? 0 : 5.99;
-  const total = subtotal + shipping;
+  const total = subtotal - discount + shipping;
 
   const handleShippingSubmit = (e) => {
     e.preventDefault();
@@ -39,12 +49,40 @@ const Checkout = () => {
     setCurrentStep(3);
   };
 
+  const handleApplyCoupon = () => {
+    if (!couponCode.trim()) {
+      setCouponError('Please enter a coupon code');
+      return;
+    }
+
+    const result = applyOffer(couponCode, subtotal);
+    if (result.success) {
+      setCouponError('');
+      setCouponCode('');
+    } else {
+      setCouponError(result.message);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    clearAppliedOffer();
+    setCouponError('');
+  };
+
   const handlePlaceOrder = () => {
-    // Get existing orders
-    const existingOrders = getOrders() || mockOrders;
+    // Update inventory
+    const currentProducts = getProducts() || products;
+    const updatedProducts = currentProducts.map(product => {
+      const cartItem = items.find(item => item.id === product.id);
+      if (cartItem) {
+        return { ...product, stock: product.stock - cartItem.quantity };
+      }
+      return product;
+    });
+    saveProducts(updatedProducts);
+
     // Create new order
     const newOrder = {
-      id: existingOrders.length + 1,
       userId: 1, // Assume default user
       userName: shippingInfo.name,
       items: items.map(item => ({
@@ -53,15 +91,25 @@ const Checkout = () => {
         quantity: item.quantity,
         price: item.price,
       })),
+      subtotal: subtotal,
+      discount: discount,
+      shipping: shipping,
       total: total,
-      status: 'Pending',
-      date: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
-      prescription: null, // No prescription for now
+      paymentMethod: paymentMethod,
+      shippingAddress: shippingInfo,
+      appliedOffer: appliedOffer,
+      prescription: uploadedPrescriptions.length > 0 ? uploadedPrescriptions[0].name : null,
     };
-    // Add new order to existing orders
-    const updatedOrders = [...existingOrders, newOrder];
-    // Save to localStorage
-    saveOrders(updatedOrders);
+
+    // Add order using context
+    const orderId = addOrder(newOrder);
+
+    // Increment offer usage if applied
+    if (appliedOffer) {
+      incrementOfferUsage(appliedOffer.id);
+      clearAppliedOffer();
+    }
+
     // Clear cart and navigate
     clearCart();
     navigate('/orders');
@@ -350,6 +398,69 @@ const Checkout = () => {
           {/* Order Summary */}
           <div className="bg-white rounded-lg shadow-md p-6 h-fit">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">Order Summary</h2>
+
+            {/* Prescription Upload Section */}
+            <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-2">
+                  <FaFilePrescription className="text-blue-600" />
+                  <span className="font-medium text-gray-800">Prescription Required?</span>
+                </div>
+                <button
+                  onClick={() => setShowPrescriptionUpload(true)}
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-300"
+                >
+                  Upload Prescription
+                </button>
+              </div>
+              {uploadedPrescriptions.length > 0 && (
+                <div className="bg-white p-3 rounded border border-blue-200">
+                  <p className="text-sm text-green-600 font-medium">✓ Prescription uploaded: {uploadedPrescriptions[0].name}</p>
+                </div>
+              )}
+            </div>
+
+            {/* Coupon Section */}
+            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-center space-x-2 mb-3">
+                <FaTag className="text-gray-600" />
+                <span className="font-medium text-gray-800">Have a coupon?</span>
+              </div>
+              {appliedOffer ? (
+                <div className="flex items-center justify-between bg-green-50 p-3 rounded">
+                  <div>
+                    <p className="font-medium text-green-800">{appliedOffer.code}</p>
+                    <p className="text-sm text-green-600">{appliedOffer.description}</p>
+                  </div>
+                  <button
+                    onClick={handleRemoveCoupon}
+                    className="text-red-500 hover:text-red-700 text-sm font-medium"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ) : (
+                <div className="flex space-x-2">
+                  <input
+                    type="text"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value)}
+                    placeholder="Enter coupon code"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
+                  <button
+                    onClick={handleApplyCoupon}
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium"
+                  >
+                    Apply
+                  </button>
+                </div>
+              )}
+              {couponError && (
+                <p className="text-red-500 text-sm mt-2">{couponError}</p>
+              )}
+            </div>
+
             <div className="space-y-4">
               {items.map((item) => (
                 <div key={item.id} className="flex justify-between items-center">
@@ -368,6 +479,12 @@ const Checkout = () => {
                 <span>Subtotal</span>
                 <span>${subtotal.toFixed(2)}</span>
               </div>
+              {discount > 0 && (
+                <div className="flex justify-between text-green-600">
+                  <span>Discount ({appliedOffer?.code})</span>
+                  <span>-${discount.toFixed(2)}</span>
+                </div>
+              )}
               <div className="flex justify-between">
                 <span>Shipping</span>
                 <span>{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span>
@@ -381,6 +498,18 @@ const Checkout = () => {
           </div>
         </div>
       </div>
+
+      {/* Prescription Upload Modal */}
+      {showPrescriptionUpload && (
+        <PrescriptionUpload
+          onUpload={(files) => {
+            setUploadedPrescriptions(files);
+            setShowPrescriptionUpload(false);
+          }}
+          onClose={() => setShowPrescriptionUpload(false)}
+          existingPrescriptions={[]} // Can be populated from user history later
+        />
+      )}
     </main>
   );
 };

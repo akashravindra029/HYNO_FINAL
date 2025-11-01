@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FaBox, FaCheckCircle, FaClock, FaTimesCircle } from 'react-icons/fa';
-import { getOrders } from '../utils/localStorage';
+import { FaBox, FaCheckCircle, FaClock, FaTimesCircle, FaTruck, FaEye } from 'react-icons/fa';
+import { useOrder } from '../contexts/OrderContext';
+import ShipmentTracking from '../components/ShipmentTracking';
 
 const Orders = () => {
+  const { getOrdersByUser, cancelOrder } = useOrder();
   const [orders, setOrders] = useState([]);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [showTracking, setShowTracking] = useState(false);
 
   useEffect(() => {
-    const allOrders = getOrders() || [];
-    // Filter orders for current user (assume userId: 1)
-    const userOrders = allOrders.filter(order => order.userId === 1);
+    const userOrders = getOrdersByUser(1); // Assume userId: 1
     setOrders(userOrders);
-  }, []);
+  }, [getOrdersByUser]);
 
   const getStatusIcon = (status) => {
     switch (status.toLowerCase()) {
@@ -40,9 +42,15 @@ const Orders = () => {
   };
 
   const handleCancelOrder = (orderId) => {
+    cancelOrder(orderId);
     setOrders(orders.map(order =>
       order.id === orderId ? { ...order, status: 'Cancelled' } : order
     ));
+  };
+
+  const handleTrackOrder = (order) => {
+    setSelectedOrder(order);
+    setShowTracking(true);
   };
 
   return (
@@ -104,22 +112,60 @@ const Orders = () => {
                   </div>
                 </div>
 
-                <div className="flex justify-between items-center">
-                  <div className="text-lg font-bold text-gray-800">
-                    Total: ${order.total.toFixed(2)}
+                <div className="border-t pt-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                      <p className="text-sm text-gray-600">Payment Method</p>
+                      <p className="font-medium text-gray-800">{order.paymentMethod || 'Cash on Delivery'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">Prescription</p>
+                      <p className="font-medium text-gray-800">
+                        {order.prescription ? (
+                          <span className="text-green-600">✓ {order.prescription}</span>
+                        ) : (
+                          <span className="text-gray-500">Not required</span>
+                        )}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-gray-600">Order Total</p>
+                      <p className="text-lg font-bold text-gray-800">${order.total.toFixed(2)}</p>
+                    </div>
                   </div>
-                  {order.status.toLowerCase() === 'processing' && (
+
+                  <div className="flex space-x-3">
                     <button
-                      onClick={() => handleCancelOrder(order.id)}
-                      className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-lg hover:shadow-xl transition-shadow duration-300"
+                      onClick={() => handleTrackOrder(order)}
+                      className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-lg hover:shadow-xl transition-shadow duration-300 flex items-center justify-center space-x-2"
                     >
-                      Cancel Order
+                      <FaTruck className="text-xs" />
+                      <span>Track Order</span>
                     </button>
-                  )}
+                    {order.status.toLowerCase() === 'processing' && (
+                      <button
+                        onClick={() => handleCancelOrder(order.id)}
+                        className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-lg hover:shadow-xl transition-shadow duration-300"
+                      >
+                        Cancel Order
+                      </button>
+                    )}
+                  </div>
                 </div>
               </motion.div>
             ))}
           </div>
+        )}
+
+        {/* Shipment Tracking Modal */}
+        {showTracking && selectedOrder && (
+          <ShipmentTracking
+            orderId={selectedOrder.id}
+            onClose={() => {
+              setShowTracking(false);
+              setSelectedOrder(null);
+            }}
+          />
         )}
       </div>
     </main>

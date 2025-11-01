@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaHome, FaShoppingCart, FaGift, FaBox, FaUser, FaSignOutAlt, FaSearch, FaBars } from 'react-icons/fa';
+import { FaHome, FaShoppingCart, FaGift, FaBox, FaUser, FaSignOutAlt, FaSearch, FaBars, FaBlog } from 'react-icons/fa';
 import { useCart } from '../contexts/CartContext';
 import { getCurrentUser } from '../utils/localStorage';
 import LoginModal from './LoginModal';
@@ -41,6 +41,7 @@ const Navbar = () => {
   const navItems = [
     { path: '/', icon: FaHome, label: 'Home' },
     { path: '/products', icon: FaShoppingCart, label: 'Products' },
+    { path: '/blog', icon: FaBlog, label: 'Blog' },
     { path: '/cart', icon: FaShoppingCart, label: 'Cart', badge: getTotalItems() },
     { path: '/offers', icon: FaGift, label: 'Offers' },
     { path: '/orders', icon: FaBox, label: 'Orders' },
