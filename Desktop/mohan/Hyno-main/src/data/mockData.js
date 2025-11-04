@@ -1,0 +1,212 @@
+// Mock data for the pharmacy app
+
+import { getOrders } from '../utils/localStorage';
+
+export const products = [
+  {
+    id: 1,
+    name: 'Metformin 500mg',
+    category: 'Diabetes',
+    price: 15.99,
+    image: 'https://via.placeholder.com/300x200?text=Metformin',
+    stock: 50,
+    description: 'Oral diabetes medicine that helps control blood sugar levels.',
+  },
+  {
+    id: 2,
+    name: 'Insulin Glargine',
+    category: 'Diabetes',
+    price: 89.99,
+    image: 'https://via.placeholder.com/300x200?text=Insulin+Glargine',
+    stock: 30,
+    description: 'Long-acting insulin used to control high blood sugar in adults and children.',
+  },
+  {
+    id: 3,
+    name: 'Paracetamol 500mg',
+    category: 'Fever',
+    price: 8.99,
+    image: 'https://via.placeholder.com/300x200?text=Paracetamol',
+    stock: 100,
+    description: 'Pain reliever and fever reducer.',
+  },
+  {
+    id: 4,
+    name: 'Ibuprofen 200mg',
+    category: 'Painkillers',
+    price: 12.99,
+    image: 'https://via.placeholder.com/300x200?text=Ibuprofen',
+    stock: 75,
+    description: 'Nonsteroidal anti-inflammatory drug (NSAID) used for pain relief.',
+  },
+  {
+    id: 5,
+    name: 'Vitamin D3 1000IU',
+    category: 'Vitamins & Supplements',
+    price: 19.99,
+    image: 'https://via.placeholder.com/300x200?text=Vitamin+D3',
+    stock: 60,
+    description: 'Essential vitamin for bone health and immune function.',
+  },
+  {
+    id: 6,
+    name: 'Baby Shampoo 200ml',
+    category: 'Baby Care',
+    price: 9.99,
+    image: 'https://via.placeholder.com/300x200?text=Baby+Shampoo',
+    stock: 40,
+    description: 'Gentle shampoo for babies and toddlers.',
+  },
+  {
+    id: 7,
+    name: 'Folic Acid 400mcg',
+    category: 'Women Care',
+    price: 14.99,
+    image: 'https://via.placeholder.com/300x200?text=Folic+Acid',
+    stock: 80,
+    description: 'Important for women planning pregnancy and during early pregnancy.',
+  },
+  {
+    id: 8,
+    name: 'Chyawanprash 500g',
+    category: 'Ayurveda',
+    price: 24.99,
+    image: 'https://via.placeholder.com/300x200?text=Chyawanprash',
+    stock: 45,
+    description: 'Traditional Ayurvedic immunity booster made with 40+ herbs and spices.',
+  },
+  {
+    id: 9,
+    name: 'Ashwagandha 500mg',
+    category: 'Ayurveda',
+    price: 19.99,
+    image: 'https://via.placeholder.com/300x200?text=Ashwagandha',
+    stock: 60,
+    description: 'Ancient adaptogenic herb for stress relief and vitality.',
+  },
+  {
+    id: 10,
+    name: 'Homeopathic Arnica Montana',
+    category: 'Homeopathy',
+    price: 12.99,
+    image: 'https://via.placeholder.com/300x200?text=Arnica+Montana',
+    stock: 70,
+    description: 'Natural remedy for bruises, pain, and inflammation.',
+  },
+  {
+    id: 11,
+    name: 'Collagen Peptides 500g',
+    category: 'Nutraceuticals',
+    price: 39.99,
+    image: 'https://via.placeholder.com/300x200?text=Collagen+Peptides',
+    stock: 35,
+    description: 'Premium hydrolyzed collagen for skin, hair, and joint health.',
+  },
+  {
+    id: 12,
+    name: 'Omega-3 Fish Oil 1000mg',
+    category: 'Nutraceuticals',
+    price: 29.99,
+    image: 'https://via.placeholder.com/300x200?text=Omega+3+Fish+Oil',
+    stock: 50,
+    description: 'High-quality fish oil supplement for heart and brain health.',
+  },
+  {
+    id: 13,
+    name: 'Protein Powder Whey 1kg',
+    category: 'Fitness & Sports',
+    price: 49.99,
+    image: 'https://via.placeholder.com/300x200?text=Whey+Protein',
+    stock: 40,
+    description: 'Premium whey protein for muscle recovery and growth.',
+  },
+  {
+    id: 14,
+    name: 'Herbal Face Wash 150ml',
+    category: 'Personal Care',
+    price: 16.99,
+    image: 'https://via.placeholder.com/300x200?text=Herbal+Face+Wash',
+    stock: 65,
+    description: 'Gentle cleansing face wash with neem and turmeric extracts.',
+  },
+  {
+    id: 15,
+    name: 'Immunity Booster Kit',
+    category: 'Wellness',
+    price: 34.99,
+    image: 'https://via.placeholder.com/300x200?text=Immunity+Kit',
+    stock: 25,
+    description: 'Complete wellness kit with Vitamin C, Zinc, and herbal supplements.',
+  },
+];
+
+export const categories = [
+  'Diabetes',
+  'Fever',
+  'Painkillers',
+  'Vitamins & Supplements',
+  'Baby Care',
+  'Women Care',
+  'Ayurveda',
+  'Homeopathy',
+  'Nutraceuticals',
+  'Wellness',
+  'Personal Care',
+  'Fitness & Sports',
+];
+
+export const users = [
+  {
+    id: 1,
+    name: 'John Doe',
+    email: 'john@example.com',
+    phone: '123-456-7890',
+    address: '123 Main St, City, State 12345',
+    dob: '1990-01-01',
+    gender: 'Male',
+  },
+  {
+    id: 2,
+    name: 'Jane Smith',
+    email: 'jane@example.com',
+    phone: '987-654-3210',
+    address: '456 Oak Ave, City, State 12345',
+    dob: '1985-05-15',
+    gender: 'Female',
+  },
+];
+
+const mockOrders = [
+  {
+    id: 1,
+    userId: 1,
+    userName: 'John Doe',
+    items: [
+      { id: 1, name: 'Metformin 500mg', quantity: 2, price: 15.99 },
+      { id: 3, name: 'Paracetamol 500mg', quantity: 1, price: 8.99 },
+    ],
+    total: 40.97,
+    status: 'Delivered',
+    date: '2023-10-01',
+    prescription: null,
+  },
+  {
+    id: 2,
+    userId: 2,
+    userName: 'Jane Smith',
+    items: [
+      { id: 5, name: 'Vitamin D3 1000IU', quantity: 1, price: 19.99 },
+    ],
+    total: 19.99,
+    status: 'Processing',
+    date: '2023-10-05',
+    prescription: 'prescription1.jpg',
+  },
+];
+
+export const orders = getOrders() || mockOrders;
+
+export const adminCredentials = {
+  email: 'admin@hynopharmacy.com',
+  password: 'admin123',
+};
